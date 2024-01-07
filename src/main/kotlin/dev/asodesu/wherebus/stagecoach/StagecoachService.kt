@@ -114,6 +114,40 @@ class StagecoachService(val objectMapper: ObjectMapper) {
         return stagecoachPostRequest("https://api.stagecoachbus.com/tis/v3/stop-event-query", payload)
     }
 
+    fun serviceTimetable(service: dev.asodesu.wherebus.stagecoach.schema.Service): ServiceTimetableResponse {
+        val departureTime = service.aimedOriginStopDepartureTime.toLongOrNull() ?: 0
+        return serviceTimetable(
+            service.serviceId,
+            departureTime,
+            service.originStopReference
+        )
+    }
+
+    fun serviceTimetable(serviceId: String, departureTime: Long, originStop: String): ServiceTimetableResponse {
+        val targetDepartureTime = Instant.ofEpochMilli(departureTime).toString()
+        val payload = ServiceTimetableQuery(
+            serviceId = serviceId,
+            genericDayPattern = "targetDateOnly",
+            departure = Departure(
+                targetDepartureTime = Value(targetDepartureTime),
+                departureStopLabel = originStop
+            ),
+            responseCharacteristics = ResponseCharacteristics(
+                maxLaterTimetableColumns = Value(1),
+                tripEvents = TripEvents(
+                    timingInformationPoints = true,
+                    nonTimingInformationPoints = true
+                ),
+                vehicleLegPaths = false,
+                stopCoordinates = false,
+                includeSituations = false,
+                generateKml = false
+            ),
+            requestId = "stagecoach-you-have-a-nice-api"
+        )
+        return stagecoachPostRequest("https://api.stagecoachbus.com/tis/v3/service-timetable-query", payload)
+    }
+
     private inline fun <reified T> stagecoachPostRequest(url: String, payload: Any): T {
         val payloadText = objectMapper.writeValueAsString(payload)
 

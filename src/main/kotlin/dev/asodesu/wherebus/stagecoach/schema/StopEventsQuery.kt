@@ -17,23 +17,3 @@ class Stops(
     @JsonProperty("StopLabel")
     val stopLabel: List<String>,
 )
-
-class Departure(
-    @JsonProperty("TargetDepartureTime")
-    val targetDepartureTime: Value<String>,
-    @JsonProperty("EarliestDepartureLeeway")
-    val earliestDepartureLeeway: String,
-    @JsonProperty("LatestDepartureLeeway")
-    val latestDepartureLeeway: String,
-)
-
-class ResponseCharacteristics(
-    @JsonProperty("MaxLaterEvents")
-    val maxLaterEvents: Value<Int>,
-    @JsonProperty("StopCoordinates")
-    val stopCoordinates: Boolean,
-    @JsonProperty("IncludeSituations")
-    val includeSituations: Boolean,
-    @JsonProperty("GenerateKML")
-    val generateKml: Boolean,
-)

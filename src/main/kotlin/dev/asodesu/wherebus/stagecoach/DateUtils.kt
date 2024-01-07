@@ -14,7 +14,7 @@ fun getTime(date: ZonedDateTime): String {
     } else if (hour < 12) {
         amPm = "AM"
     }
-    return "${hour}:${date.minute} $amPm"
+    return String.format("%d:%02d %s", hour, date.minute, amPm)
 }
 
 fun parseSeconds(iso: String): Long {

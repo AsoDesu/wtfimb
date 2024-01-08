@@ -15,17 +15,19 @@ class SubscriptionManager {
     @Autowired
     private lateinit var stagecoach: StagecoachService
 
-    private val subscriptions = mutableSetOf<Subscription>()
+    private val subscriptions = mutableMapOf<String, Subscription>()
 
     fun newSubscription(member: Member, channel: GuildMessageChannel, service: ServiceDetail): Subscription {
         val guild = channel.guild
         val jda = context.getBean(JDA::class.java)
         val subscription = Subscription(guild.id, member.id, channel.id, service, jda, stagecoach)
-        subscriptions.add(subscription)
+        subscriptions[member.id] = subscription
 
         return subscription
     }
 
-    fun getSubscriptionByUser(userId: String) = subscriptions.firstOrNull { it.discordUserId == userId }
+    fun removeSubscriptions(userId: String) = subscriptions.remove(userId)
+
+    fun getSubscriptionByUser(userId: String) = subscriptions[userId]
 
 }

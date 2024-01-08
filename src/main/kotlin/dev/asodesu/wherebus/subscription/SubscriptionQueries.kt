@@ -61,7 +61,7 @@ class SubscriptionQueries(val subscription: Subscription) {
 
         if (!vehicle.isNullOrBlank()) {
             val (_, fleetNo) = vehicle.split("-")
-            val button = Button.link("https://wtfimb.asodesu.dev/map?bus=$fleetNo", "View on map")
+            val button = Button.link("http://rpi.asodev.net:5500/map?bus=$fleetNo", "View on map")
                 .withEmoji(Emoji.fromUnicode("U+1F30D"))
             message.addActionRow(button)
         }
@@ -90,7 +90,7 @@ class SubscriptionQueries(val subscription: Subscription) {
             appendLine(":bus: **Assigned Vehicle: ** `$vehicleRef`")
             appendLine("> :hourglass_flowing_sand: **Last Update: ** <t:${lastUpdateMillis / 1000}:R>")
             appendLine("> :round_pushpin: **On route: ** ${vehicleInfo.serviceNumber} | ${vehicleInfo.serviceDescription}")
-            appendLine("> :busstop: **Next Stop: ** `${nextStop?.name ?: ""}`")
+            appendLine("> :busstop: **Next Stop: ** `${nextStop?.name ?: "Unknown"}`")
         }
     }
 

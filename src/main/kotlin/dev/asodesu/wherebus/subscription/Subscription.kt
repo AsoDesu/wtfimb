@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.interactions.components.ItemComponent
 import net.dv8tion.jda.api.interactions.components.buttons.Button
@@ -22,9 +23,8 @@ import java.time.ZoneId
 import java.time.temporal.TemporalAccessor
 
 class Subscription(
-    val guildId: String,
     val discordUserId: String,
-    val channelId: String,
+    val channel: MessageChannel,
     val service: ServiceDetail,
 
     private val jda: JDA,
@@ -36,13 +36,6 @@ class Subscription(
     private val queries = SubscriptionQueries(this)
 
     fun query() = queries.query()
-
-    private val guild get() = jda.getGuildById(guildId)
-        ?: throw DiscordLinkException("Guild ($guildId) for subscription $discordUserId was not found!")
-    private val channel get() = guild.getChannelById(GuildMessageChannel::class.java, channelId)
-        ?: throw DiscordLinkException("Channel ($channelId) for subscription $discordUserId was not found!")
-    private val member get() = guild.getMemberById(discordUserId)
-        ?: throw DiscordLinkException("Member ($guildId) for subscription $discordUserId was not found!")
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

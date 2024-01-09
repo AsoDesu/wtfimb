@@ -2,8 +2,8 @@ package dev.asodesu.wherebus.subscription
 
 import dev.asodesu.wherebus.stagecoach.StagecoachService
 import net.dv8tion.jda.api.JDA
-import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
+import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Component
@@ -17,11 +17,10 @@ class SubscriptionManager {
 
     private val subscriptions = mutableMapOf<String, Subscription>()
 
-    fun newSubscription(member: Member, channel: GuildMessageChannel, service: ServiceDetail): Subscription {
-        val guild = channel.guild
+    fun newSubscription(user: User, channel: MessageChannel, service: ServiceDetail): Subscription {
         val jda = context.getBean(JDA::class.java)
-        val subscription = Subscription(guild.id, member.id, channel.id, service, jda, stagecoach)
-        subscriptions[member.id] = subscription
+        val subscription = Subscription(user.id, channel, service, jda, stagecoach)
+        subscriptions[user.id] = subscription
 
         return subscription
     }

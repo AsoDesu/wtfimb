@@ -35,9 +35,7 @@ class SubscribeCommand(val stagecoach: StagecoachService) : Command {
             ?: return evt.reply("You must provide a trip!").setEphemeral(true).queue()
         val service = decodeServiceTime(trip.asString, stop.asString)
 
-        val member = evt.member
-            ?: return evt.reply("You must run this command in a server!").setEphemeral(true).queue()
-        val subscription = subscriptions.newSubscription(member, evt.channel.asGuildMessageChannel(), service)
+        val subscription = subscriptions.newSubscription(evt.user, evt.channel.asGuildMessageChannel(), service)
 
         val hook = evt.deferReply(true).complete()
         val message = subscription.query()

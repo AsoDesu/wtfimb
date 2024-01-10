@@ -1,29 +1,13 @@
 package dev.asodesu.wherebus.subscription
 
-import dev.asodesu.wherebus.exceptions.DiscordLinkException
 import dev.asodesu.wherebus.stagecoach.StagecoachService
-import dev.asodesu.wherebus.stagecoach.getTime
 import dev.asodesu.wherebus.stagecoach.parseSeconds
 import dev.asodesu.wherebus.stagecoach.schema.*
-import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
-import net.dv8tion.jda.api.entities.Message
-import net.dv8tion.jda.api.entities.MessageEmbed
-import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
-import net.dv8tion.jda.api.entities.emoji.Emoji
-import net.dv8tion.jda.api.interactions.components.ItemComponent
-import net.dv8tion.jda.api.interactions.components.buttons.Button
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle
-import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder
-import net.dv8tion.jda.api.utils.messages.MessageCreateData
-import java.time.Instant
-import java.time.ZoneId
-import java.time.temporal.TemporalAccessor
 
 class Subscription(
     val discordUserId: String,
-    val channel: MessageChannel,
     val service: ServiceDetail,
 
     private val jda: JDA,
@@ -32,7 +16,8 @@ class Subscription(
     var timetable: ServiceTimetableResponse? = null
     var assignedVehicleRef: String? = null
 
-    private val queries = SubscriptionQueries(this)
+    private val queries = SubscriptionQuery(this)
+    var realTimeUpdater: RealTimeUpdater? = null
 
     fun query() = queries.query()
 

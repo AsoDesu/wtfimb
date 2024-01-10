@@ -1,8 +1,7 @@
 package dev.asodesu.wherebus.commands
 
-import dev.asodesu.wherebus.subscription.SubscriptionManager
+import dev.asodesu.wherebus.subscription.manager.SubscriptionManager
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component

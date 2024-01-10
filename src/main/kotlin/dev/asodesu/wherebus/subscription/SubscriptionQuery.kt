@@ -2,9 +2,7 @@ package dev.asodesu.wherebus.subscription
 
 import dev.asodesu.wherebus.Values
 import dev.asodesu.wherebus.stagecoach.getTime
-import dev.asodesu.wherebus.stagecoach.parseSeconds
 import dev.asodesu.wherebus.stagecoach.schema.Service
-import dev.asodesu.wherebus.stagecoach.schema.ServiceTimetableResponse
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.interactions.components.buttons.Button
@@ -13,7 +11,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData
 import java.time.Instant
 import java.time.ZoneId
 
-class SubscriptionQueries(private val subscription: Subscription) {
+class SubscriptionQuery(private val subscription: Subscription) {
     private val stagecoach by subscription::stagecoach
     private val service by subscription::service
     private var timetable by subscription::timetable

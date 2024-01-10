@@ -5,12 +5,17 @@ import dev.asodesu.wherebus.stagecoach.getTime
 import dev.asodesu.wherebus.stagecoach.parseSeconds
 import dev.asodesu.wherebus.stagecoach.schema.Direction
 import dev.asodesu.wherebus.stagecoach.schema.Event
+import dev.asodesu.wherebus.subscription.RealTimeUpdater
 import dev.asodesu.wherebus.subscription.ServiceDetail
-import dev.asodesu.wherebus.subscription.SubscriptionManager
+import dev.asodesu.wherebus.subscription.manager.SubscriptionManager
+import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
+import net.dv8tion.jda.api.interactions.components.buttons.Button
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.time.Instant
@@ -27,18 +32,67 @@ class SubscribeCommand(val stagecoach: StagecoachService) : Command {
     override fun create() = SubcommandData(name, "Subscribes to a service arrival")
         .addOption(OptionType.STRING, "stop", "The stop you're bus is stopping", true, true)
         .addOption(OptionType.STRING, "trip", "The trip you're taking", true, true)
+        .addOption(OptionType.BOOLEAN, "realtime", "If you want real-time update DMs about your bus", false)
 
     override fun handle(evt: SlashCommandInteractionEvent) {
         val stop = evt.getOption("stop")
             ?: return evt.reply("You must provide a stop!").setEphemeral(true).queue()
         val trip = evt.getOption("trip")
             ?: return evt.reply("You must provide a trip!").setEphemeral(true).queue()
-        val service = decodeServiceTime(trip.asString, stop.asString)
+        val doRealtimeUpdates = evt.getOption("realtime")?.asBoolean ?: true
+        var realtimeDisabledReason = "You opted to disable Real-Time updates"
 
-        val subscription = subscriptions.newSubscription(evt.user, evt.channel.asGuildMessageChannel(), service)
+        val service = decodeServiceTime(trip.asString, stop.asString)
+        val subscription = subscriptions.newSubscription(evt.user, service)
+
+        if (doRealtimeUpdates) {
+            val event = service.getEvent(stagecoach)
+            val tripService = event.trip.service
+
+            val successEmbed = EmbedBuilder()
+                .setTitle("✅ Subscribed to ${tripService.serviceNumber} | ${tripService.description}")
+                .setDescription("""
+                Updates about this bus will be DM'd to you!
+                *You can silence updates by clicking the button below*
+            """.trimIndent())
+                .setColor(stagecoach.getStagecoachColor())
+                .setTimestamp(Instant.now())
+                .build()
+            val silenceButton = Button.primary("Silence", "Silence")
+                .withEmoji(Emoji.fromUnicode("U+1F515"))
+                .withId("silent_${evt.user.id}")
+            val successMessage = MessageCreateBuilder()
+                .addEmbeds(successEmbed)
+                .addActionRow(silenceButton)
+                .build()
+
+            val channel = evt.user.openPrivateChannel()
+                .useCache(true)
+                .onErrorMap {
+                    realtimeDisabledReason = "Real-Time updates are disabled because we can't DM you"
+                    null
+                }
+                .complete()
+            if (channel == null) {
+                subscription.realTimeUpdater = null
+            } else {
+                subscription.realTimeUpdater = RealTimeUpdater(subscription, channel)
+                channel.sendMessage(successMessage).queue()
+            }
+        }
 
         val hook = evt.deferReply(true).complete()
-        val message = subscription.query()
+        var message = subscription.query()
+        if (subscription.realTimeUpdater == null) {
+            val failDmEmbed = EmbedBuilder()
+                .setTitle(":no_bell: Real-Time update DMs disabled")
+                .setDescription(realtimeDisabledReason)
+                .setColor(stagecoach.getStagecoachColor())
+                .build()
+            message = MessageCreateBuilder.from(message)
+                .addEmbeds(failDmEmbed)
+                .build()
+        }
         hook.sendMessage(message).queue()
     }
 

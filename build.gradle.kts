@@ -27,6 +27,16 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
+tasks.withType<ProcessResources> {
+    val file = File("frontend/build/")
+    if (!file.exists()) {
+        logger.error("No frontend has been built! Run 'cd ./frontend/ && npm run build' to build the frontend!")
+    }
+    from(file) {
+        into("static")
+    }
+}
+
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs += "-Xjsr305=strict"

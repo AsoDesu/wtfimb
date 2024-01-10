@@ -1,5 +1,6 @@
 package dev.asodesu.wherebus.subscription
 
+import dev.asodesu.wherebus.Values
 import dev.asodesu.wherebus.stagecoach.getTime
 import dev.asodesu.wherebus.stagecoach.parseSeconds
 import dev.asodesu.wherebus.stagecoach.schema.Service
@@ -62,7 +63,7 @@ class SubscriptionQueries(private val subscription: Subscription) {
 
         if (!vehicle.isNullOrBlank()) {
             val (_, fleetNo) = vehicle.split("-")
-            val button = Button.link("http://rpi.asodev.net:5500/map?bus=$fleetNo", "View on map")
+            val button = Button.link("${Values.baseUrl}/map?bus=$fleetNo", "View on map")
                 .withEmoji(Emoji.fromUnicode("U+1F30D"))
             message.addActionRow(button)
         }

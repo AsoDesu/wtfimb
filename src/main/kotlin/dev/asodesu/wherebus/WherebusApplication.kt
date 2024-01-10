@@ -35,7 +35,7 @@ object WherebusBootstrap {
             }
 
             logger.error("Properties file was not found, so the default one has been created!")
-            logger.error("Please configure the bot in the 'app.properties' file and start up again!")
+            logger.error("Please configure the bot in the 'application.properties' file and start up again!")
             return
         }
         val app = SpringApplication(WherebusApplication::class.java)

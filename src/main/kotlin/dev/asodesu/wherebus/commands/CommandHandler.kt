@@ -3,21 +3,22 @@ package dev.asodesu.wherebus.commands
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import net.dv8tion.jda.api.hooks.EventListener
 import net.dv8tion.jda.api.hooks.SubscribeEvent
-import net.dv8tion.jda.api.interactions.commands.build.Commands
-import net.dv8tion.jda.api.utils.messages.MessageCreateData
 import java.util.concurrent.Executors
 
 class CommandHandler(val jda: JDA, val commands: List<Command>) {
     private val threadPool = Executors.newCachedThreadPool()
 
     fun create() {
-        val subCommands = commands.map { it.create() }
-        val command = Commands.slash("stagecoach", "The stagecoach bus command")
-            .addSubcommands(subCommands)
+        val groupedCommands = commands.groupBy { it.parentCommand }
+        val commands = groupedCommands.map { (parent, subCommands) ->
+            val subCommandsData = subCommands.map { it.create() }
+            parent.addSubcommands(subCommandsData)
+        }
+
         jda.guilds.forEach {
-            it.updateCommands().addCommands(command)
+            it.updateCommands()
+                .addCommands(commands)
                 .queue()
         }
     }

@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
 
 interface Command {
     val name: String
+    val parentCommand: SlashCommandData
 
     fun create(): SubcommandData
     fun handle(evt: SlashCommandInteractionEvent)

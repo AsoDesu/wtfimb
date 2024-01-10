@@ -25,4 +25,6 @@ class UnsubscribeCommand(val subscriptions: SubscriptionManager) : Command {
             evt.reply("Unsubscribed from bus trip: **${service.number}** at $time").setEphemeral(true).queue()
         }
     }
+
+    override val parentCommand = Commands.stagecoach
 }

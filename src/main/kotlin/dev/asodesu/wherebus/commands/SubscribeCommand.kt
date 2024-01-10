@@ -88,4 +88,6 @@ class SubscribeCommand(val stagecoach: StagecoachService) : Command {
         val serviceNumber = service.dropLast(1)
         return ServiceDetail(serviceNumber, direction, seconds, stopId)
     }
+
+    override val parentCommand = Commands.stagecoach
 }

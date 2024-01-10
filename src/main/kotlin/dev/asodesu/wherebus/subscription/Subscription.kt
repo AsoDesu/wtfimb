@@ -4,8 +4,7 @@ import dev.asodesu.wherebus.exceptions.DiscordLinkException
 import dev.asodesu.wherebus.stagecoach.StagecoachService
 import dev.asodesu.wherebus.stagecoach.getTime
 import dev.asodesu.wherebus.stagecoach.parseSeconds
-import dev.asodesu.wherebus.stagecoach.schema.Service
-import dev.asodesu.wherebus.stagecoach.schema.ServiceTimetableResponse
+import dev.asodesu.wherebus.stagecoach.schema.*
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Message
@@ -36,6 +35,15 @@ class Subscription(
     private val queries = SubscriptionQueries(this)
 
     fun query() = queries.query()
+
+    fun getCallFromMonitor(monitor: StopMonitorResponse): MonitoredCall? {
+        val stops = monitor.stopMonitors.stopMonitor?.firstOrNull()
+        return stops?.monitoredCalls?.monitoredCall?.firstOrNull { call ->
+            call.lineRef == service.number
+                    && call.direction.equals(service.direction.name, true)
+                    && parseSeconds(call.aimedArrivalTime) == service.epochSeconds
+        }
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

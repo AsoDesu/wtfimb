@@ -143,7 +143,7 @@ class StagecoachService(val objectMapper: ObjectMapper) {
                 includeSituations = false,
                 generateKml = false
             ),
-            requestId = "stagecoach-you-have-a-nice-api"
+            requestId = serviceId
         )
         return stagecoachPostRequest("https://api.stagecoachbus.com/tis/v3/service-timetable-query", payload)
     }

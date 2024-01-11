@@ -59,7 +59,7 @@ class SubscriptionQuery(private val subscription: Subscription) {
         val message = MessageCreateBuilder()
             .addEmbeds(embed)
 
-        if (!vehicle.isNullOrBlank()) {
+        if (!vehicle.isNullOrBlank() && Values.baseUrl.isNotBlank()) {
             val (_, fleetNo) = vehicle.split("-")
             val button = Button.link("${Values.baseUrl}/map?bus=$fleetNo", "View on map")
                 .withEmoji(Emoji.fromUnicode("U+1F30D"))
@@ -74,29 +74,8 @@ class SubscriptionQuery(private val subscription: Subscription) {
         if (vehicleRef.isNullOrBlank()) return noBusDesc
 
         val (_, fleetNo) = vehicleRef.split("-")
-        val vehicleInfo = getVehicleInfo(fleetNo) ?: return noBusDesc
-        val lastUpdateMillis = vehicleInfo.updateTime.toLongOrNull() ?: 0
-
-        if (timetable == null || timetable?.requestId != vehicleInfo.serviceId) {
-            timetable = stagecoach.serviceTimetable(vehicleInfo)
-        }
-        val timetable = timetable!!
-        val nextStop = timetable.timetableRows?.timetableRow?.firstOrNull { row ->
-            row.stop.stopLabel == vehicleInfo.nextStopOnRoute
-        }
-
-        return buildString {
-            appendLine()
-            appendLine(":bus: **Assigned Vehicle: ** `$vehicleRef`")
-            appendLine("> :hourglass_flowing_sand: **Last Update: ** <t:${lastUpdateMillis / 1000}:R>")
-            appendLine("> :round_pushpin: **On route: ** ${vehicleInfo.serviceNumber} | ${vehicleInfo.serviceDescription}")
-            appendLine("> :busstop: **Next Stop: ** `${nextStop?.name ?: "Unknown"}`")
-        }
+        val vehicleInfo = stagecoach.getVehicle(fleetNo).services.firstOrNull() ?: return noBusDesc
+        val desc = subscription.getVehicleDescription(vehicleInfo)
+        return "\n" + desc
     }
-
-    private fun getVehicleInfo(fleet: String): Service? {
-        val info = stagecoach.getVehicle(fleet)
-        return info.services.firstOrNull()
-    }
-
 }

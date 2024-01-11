@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.hooks.AnnotatedEventManager
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.info.BuildProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.PropertySource
@@ -17,12 +18,11 @@ import kotlin.math.log
 import kotlin.system.exitProcess
 
 @Configuration
-@PropertySource("classpath:/META-INF/build-info.properties")
 class JDAConfig {
     val logger = LoggerFactory.getLogger(this::class.java)
 
     @Autowired
-    lateinit var env: Environment
+    lateinit var buildInfo: BuildProperties
 
     @Value("\${discord.bot-token}")
     lateinit var token: String
@@ -39,7 +39,7 @@ class JDAConfig {
             exitProcess(0)
         }
 
-        val activity = Activity.watching("busses - ${env.getProperty("build.version")}")
+        val activity = Activity.watching("busses - ${buildInfo.version}")
 
         val jda = JDABuilder.createDefault(token)
             .setEventManager(AnnotatedEventManager())

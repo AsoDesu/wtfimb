@@ -30,6 +30,33 @@ class Subscription(
         }
     }
 
+    fun getVehicleDescription(vehicleInfo: Service): String {
+        val lastUpdateMillis = vehicleInfo.updateTime.toLongOrNull() ?: 0
+
+        val timetable = getTimetable(vehicleInfo)
+        val nextStop = getStopFromTimetable(timetable, vehicleInfo.nextStopOnRoute)
+
+        return buildString {
+            appendLine(":bus: **Assigned Vehicle: ** `${vehicleInfo.fleetNumber}`")
+            appendLine("> :hourglass_flowing_sand: **Last Update: ** <t:${lastUpdateMillis / 1000}:R>")
+            appendLine("> :round_pushpin: **On route: ** ${vehicleInfo.serviceNumber} | ${vehicleInfo.serviceDescription}")
+            appendLine("> :busstop: **Next Stop: ** `${nextStop?.name ?: "Unknown"}`")
+        }
+    }
+
+    fun getTimetable(vehicleInfo: Service): ServiceTimetableResponse {
+        if (timetable == null || timetable?.requestId != vehicleInfo.serviceId) {
+            timetable = stagecoach.serviceTimetable(vehicleInfo)
+        }
+        return timetable!!
+    }
+
+    fun getStopFromTimetable(timetable: ServiceTimetableResponse, stopLabel: String): TimetableRow? {
+        return timetable.timetableRows?.timetableRow?.firstOrNull { row ->
+            row.stop.stopLabel == stopLabel
+        }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

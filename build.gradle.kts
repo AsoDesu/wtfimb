@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "dev.asodesu"
-version = "0.0.1"
+version = "0.0.2"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -25,6 +25,10 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("net.dv8tion:JDA:5.0.0-beta.19")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
+
+springBoot {
+    buildInfo()
 }
 
 tasks.withType<ProcessResources> {

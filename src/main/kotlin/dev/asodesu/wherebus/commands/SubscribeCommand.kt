@@ -40,59 +40,18 @@ class SubscribeCommand(val stagecoach: StagecoachService) : Command {
         val trip = evt.getOption("trip")
             ?: return evt.reply("You must provide a trip!").setEphemeral(true).queue()
         val doRealtimeUpdates = evt.getOption("realtime")?.asBoolean ?: true
-        var realtimeDisabledReason = "You opted to disable Real-Time updates"
 
         val service = decodeServiceTime(trip.asString, stop.asString)
         val subscription = subscriptions.newSubscription(evt.user, service)
 
         if (doRealtimeUpdates) {
-            val event = service.getEvent(stagecoach)
-            val tripService = event.trip.service
-
-            val successEmbed = EmbedBuilder()
-                .setTitle("✅ Subscribed to ${tripService.serviceNumber} | ${tripService.description}")
-                .setDescription("""
-                Updates about this bus will be DM'd to you!
-                *You can silence updates by clicking the button below*
-            """.trimIndent())
-                .setColor(stagecoach.getStagecoachColor())
-                .setTimestamp(Instant.now())
-                .build()
-            val silenceButton = Button.primary("Silence", "Silence")
-                .withEmoji(Emoji.fromUnicode("U+1F515"))
-                .withId("silent_${evt.user.id}")
-            val successMessage = MessageCreateBuilder()
-                .addEmbeds(successEmbed)
-                .addActionRow(silenceButton)
-                .build()
-
-            val channel = evt.user.openPrivateChannel()
-                .useCache(true)
-                .onErrorMap {
-                    realtimeDisabledReason = "Real-Time updates are disabled because we can't DM you"
-                    null
-                }
-                .complete()
-            if (channel == null) {
-                subscription.realTimeUpdater = null
-            } else {
-                subscription.realTimeUpdater = RealTimeUpdater(subscription, channel)
-                channel.sendMessage(successMessage).queue()
-            }
+            subscription.realTimeUpdater = RealTimeUpdater(subscription, evt.channel)
+            // run updates just to save any changing values and not send a ton of pings next tick
+            subscription.realTimeUpdater?.runUpdates()
         }
 
         val hook = evt.deferReply(true).complete()
-        var message = subscription.query()
-        if (subscription.realTimeUpdater == null) {
-            val failDmEmbed = EmbedBuilder()
-                .setTitle(":no_bell: Real-Time update DMs disabled")
-                .setDescription(realtimeDisabledReason)
-                .setColor(stagecoach.getStagecoachColor())
-                .build()
-            message = MessageCreateBuilder.from(message)
-                .addEmbeds(failDmEmbed)
-                .build()
-        }
+        val message = subscription.query()
         hook.sendMessage(message).queue()
     }
 

@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "dev.asodesu"
-version = "0.0.2"
+version = "0.0.3"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17

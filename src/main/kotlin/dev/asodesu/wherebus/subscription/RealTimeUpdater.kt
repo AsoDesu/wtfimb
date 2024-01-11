@@ -66,31 +66,29 @@ class RealTimeUpdater(private val subscription: Subscription, val channel: Messa
             val description = subscription.getVehicleDescription(vehicleInfo)
             updates.addUpdate(
                 EmbedBuilder()
-                    .setTitle("\uD83D\uDCD6 Bus information available!")
+                    .setTitle(":book: Bus information available!")
                     .setDescription(description)
                     .setColor(vehicleAssignedColour)
                     .build()
             )
-        } else if (lastVehicleInfo?.serviceId != vehicleInfo.serviceId) {
+        } else if (isOnRoute) {
             val routeDescription = "${vehicleInfo.serviceNumber} | ${vehicleInfo.serviceDescription}"
-            if (isSameService && isSameDirection) {
+            if (lastVehicleInfo?.serviceId != vehicleInfo.serviceId) {
                 updates.addUpdate(
                     EmbedBuilder()
-                        .setTitle("� Bus route started")
+                        .setTitle(":checkered_flag: Bus route started")
                         .setDescription("Your bus has started route **${routeDescription}**")
                         .setColor(busRouteStartedColour)
                         .build()
                 )
             }
-        }
 
-        val timetable = subscription.getTimetable(vehicleInfo)
-        if (isOnRoute && lastVehicleInfo?.nextStopOnRoute != vehicleInfo.nextStopOnRoute) {
-            if (vehicleInfo.nextStopOnRoute == service.stopId) {
+            if (lastVehicleInfo?.nextStopOnRoute != vehicleInfo.nextStopOnRoute && vehicleInfo.nextStopOnRoute == service.stopId) {
+                val timetable = subscription.getTimetable(vehicleInfo)
                 val stopInfo = subscription.getStopFromTimetable(timetable, vehicleInfo.nextStopOnRoute)
                 updates.addUpdate(
                     EmbedBuilder()
-                        .setTitle("\uD83D\uDE8F You're stop is next!")
+                        .setTitle(":busstop: You're stop is next!")
                         .setDescription("Your bus will be at **${stopInfo?.name ?: "Unknown?"}** next!")
                         .setColor(nextStopColour)
                         .build()

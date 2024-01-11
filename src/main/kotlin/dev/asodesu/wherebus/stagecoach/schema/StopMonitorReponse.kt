@@ -29,10 +29,10 @@ class MonitoredCall(
     val direction: String,
     val vehicleRef: String,
     val cancelled: Boolean,
-    val aimedArrivalTime: String,
-    val aimedDepartureTime: String,
+    val aimedArrivalTime: String
 ) {
 
+    var aimedDepartureTime: String? = null
     var expectedArrivalTime: String? = null
     var expectedDepartureTime: String? = null
 

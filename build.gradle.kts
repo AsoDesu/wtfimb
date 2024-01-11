@@ -41,6 +41,10 @@ tasks.withType<ProcessResources> {
     }
 }
 
+tasks.jar {
+    enabled = false
+}
+
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs += "-Xjsr305=strict"

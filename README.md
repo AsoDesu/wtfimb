@@ -1,4 +1,4 @@
-# Where the heck is my bus?
+# Where the "heck" is my bus?
 
 wtfimb is a Discord Bot & Web App which provides you with updates and additional information
 about a bus trip, using Stagecoach's services
@@ -23,4 +23,4 @@ So if you're waiting at the start of a route, you got no info.
 
 **How does it work?**\
 It takes info from several sources that can be found on the stagecoach website and app, and
-checks for updates, and sends them too you!\
+checks for updates, and sends them too you!

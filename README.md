@@ -5,6 +5,12 @@ about a bus trip, using Stagecoach's services
 
 ###### Note: Stagecoach's Vehicle tracking API likes to go down a lot, so don't be surprised if this is broken
 
+### TODO:
+ - [x] Real-time update pings
+ - [ ] Save subscriptions to a database and load them on start
+ - [ ] Move trip selection to a dropdown menu & buttons
+ - [ ] Add a query command for any bus trip, not just the subscribed one
+
 ### How to use the bot
 
 1. Run `/stagecoach subscribe` with your stop, and the bus trip you're taking

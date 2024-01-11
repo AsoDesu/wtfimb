@@ -32,19 +32,23 @@ class RealTimeUpdater(private val subscription: Subscription, val channel: Messa
         val call = subscription.getCallFromMonitor(monitor)
 
         val currentExpectedIsoTime = call?.expectedArrivalTime
+        val currentScheduledTime = call?.aimedArrivalTime?.let { parseSeconds(it) }
         if (!currentExpectedIsoTime.isNullOrBlank()) {
             val currentExpectedTime = parseSeconds(currentExpectedIsoTime)
             val notifyDistance = abs(lastExpectedTime - currentExpectedTime)
             if (notifyDistance >= timeNotifyDeltaSeconds || lastExpectedTime == -1L) {
+                // only send the update if this isn't out first update, and we're on time
+                if (lastExpectedTime != -1L && currentExpectedTime != currentScheduledTime) {
+                    val time = getTime(Instant.ofEpochSecond(currentExpectedTime).atZone(ZoneId.systemDefault()))
+                    updates.addUpdate(
+                        EmbedBuilder()
+                            .setTitle("⏰ Expected Time Changed")
+                            .setDescription("Your bus is now expected to arrive at **${time}** (<t:$currentExpectedTime:R>)")
+                            .setColor(expectedTimeChangeColour)
+                            .build()
+                    )
+                }
                 lastExpectedTime = currentExpectedTime
-                val time = getTime(Instant.ofEpochSecond(currentExpectedTime).atZone(ZoneId.systemDefault()))
-                updates.addUpdate(
-                    EmbedBuilder()
-                        .setTitle("⏰ Expected Time Changed")
-                        .setDescription("Your bus is now expected to arrive at **${time}** (<t:$currentExpectedTime:R>)")
-                        .setColor(expectedTimeChangeColour)
-                        .build()
-                )
             }
         }
 

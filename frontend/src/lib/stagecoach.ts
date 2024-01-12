@@ -1,6 +1,6 @@
 import type { Service } from "./stagecoachTypes"
 
-const BASE_URL = "http://localhost:8080"
+const BASE_URL = ""
 
 export function fetchVehicleInfo(fleetNo: string): Promise<Service> {
     return fetch(`${BASE_URL}/api/stagecoach/vehicle/${fleetNo}`)

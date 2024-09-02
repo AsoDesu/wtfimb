@@ -43,5 +43,5 @@ data class Service(
     val snapLongitude: String,
     val snapLatitude: String,
     val secondsOffRoute: String,
-    val rag: String,
+    val rag: String?,
 )

@@ -4,7 +4,6 @@ import dev.asodesu.wherebus.stagecoach.StagecoachService
 import dev.asodesu.wherebus.stagecoach.parseSeconds
 import dev.asodesu.wherebus.stagecoach.schema.*
 import net.dv8tion.jda.api.JDA
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
 
 class Subscription(
     val discordUserId: String,
@@ -41,6 +40,18 @@ class Subscription(
             appendLine("> :hourglass_flowing_sand: **Last Update: ** <t:${lastUpdateMillis / 1000}:R>")
             appendLine("> :round_pushpin: **On route: ** ${vehicleInfo.serviceNumber} | ${vehicleInfo.serviceDescription}")
             appendLine("> :busstop: **Next Stop: ** `${nextStop?.name ?: "Unknown"}`")
+            appendLine("> :barber: **Bus Capacity: ** ${getCapacityEmoji(vehicleInfo.rag)}")
+        }
+    }
+
+    private fun getCapacityEmoji(rag: String?): String {
+        return when(rag?.uppercase()) {
+            "G" -> ":green_square:" // green
+            "A" -> ":orange_square:" // amber
+            "R" -> ":red_square:" // red
+            "S" -> ":school:" // education
+            "X" -> ":money_with_wings:" // business
+            else -> ":blue_circle:" // unknown
         }
     }
 

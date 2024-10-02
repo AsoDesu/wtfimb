@@ -38,7 +38,6 @@ data class Service(
     val previousStopOnRoute: String,
     val currentStopOnRoute: String,
     val nextStopOnRoute: String,
-    val isJourneyCompletedHeuristic: String,
     val metresFromRoute: String,
     val snapLongitude: String,
     val snapLatitude: String,

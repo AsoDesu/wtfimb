@@ -35,17 +35,6 @@ class StagecoachServiceImpl(val objectMapper: ObjectMapper) : StagecoachService 
 
     @PostConstruct
     fun postConstruct() {
-        logger.info("Requesting tokens from stagecoach...")
-        val request = Request.Builder()
-            .get()
-            .url("https://www.stagecoachbus.com/config/config.json")
-            .build()
-        val response = client.newCall(request).execute()
-        val text = response.body?.string() ?: "{}"
-        val config = objectMapper.readValue<StagecoachConfig>(text)
-
-        adcUrl = config.avl.url
-        tisUrl = config.tis.url
         authHeaders = mapOf(
             "X-SC-securityMethod" to "API",
             "X-SC-apiKey" to apiKey

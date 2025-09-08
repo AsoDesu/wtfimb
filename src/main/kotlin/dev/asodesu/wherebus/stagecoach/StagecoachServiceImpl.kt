@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import dev.asodesu.wherebus.stagecoach.schema.*
 import jakarta.annotation.PostConstruct
+import org.springframework.beans.factory.annotation.Value as SpringValue
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -24,8 +25,12 @@ class StagecoachServiceImpl(val objectMapper: ObjectMapper) : StagecoachService 
     private val jsonMediaType = "application/json".toMediaType()
     val colors = arrayOf("039b78", "f9ae00", "0079c1")
 
-    var adcUrl = ""
-    var tisUrl = ""
+    @SpringValue("\${stagecoach.api-key}")
+    lateinit var apiKey: String
+    @SpringValue("\${stagecoach.avl-url}")
+    lateinit var adcUrl: String
+    @SpringValue("\${stagecoach.tis-url}")
+    lateinit var tisUrl: String
     var authHeaders: Map<String, String> = mapOf()
 
     @PostConstruct
@@ -41,7 +46,10 @@ class StagecoachServiceImpl(val objectMapper: ObjectMapper) : StagecoachService 
 
         adcUrl = config.avl.url
         tisUrl = config.tis.url
-        authHeaders = config.tis.headers!!
+        authHeaders = mapOf(
+            "X-SC-securityMethod" to "API",
+            "X-SC-apiKey" to apiKey
+        )
     }
 
     override fun getVehicle(fleetNo: String): VehiclesResponse {
@@ -60,6 +68,25 @@ class StagecoachServiceImpl(val objectMapper: ObjectMapper) : StagecoachService 
         val response = makeRequest(request)
         val text = response.body?.string() ?: "{}"
         return objectMapper.readValue(text)
+    }
+
+    override fun getVehicles(params: Map<String, String>): String {
+        val url = HttpUrl.Builder()
+            .scheme("https")
+            .host("api.stagecoach-technology.net")
+            .addPathSegments("vehicle-tracking/v1/vehicles")
+            .also { url ->
+                params.forEach { url.addQueryParameter(it.key, it.value) }
+            }
+            .build()
+
+        val request = Request.Builder()
+            .get()
+            .url(url)
+            .build()
+        val response = makeRequest(request)
+        val text = response.body?.string() ?: "{\"services\":[]}"
+        return text
     }
 
     override fun searchStops(query: String): SearchResults {

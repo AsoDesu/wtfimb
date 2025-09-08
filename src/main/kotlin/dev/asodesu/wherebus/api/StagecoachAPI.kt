@@ -6,8 +6,10 @@ import dev.asodesu.wherebus.stagecoach.schema.ServiceTimetableResponse
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 
@@ -23,6 +25,11 @@ class StagecoachAPI(val stagecoach: StagecoachService) {
         if (vehicleInfo.services.isEmpty())
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle was not found!")
         return vehicleInfo.services.first()
+    }
+
+    @GetMapping("/vehicles", produces = ["application/json"])
+    fun getVehicles(@RequestParam params: Map<String,String>): String {
+        return stagecoach.getVehicles(params)
     }
 
     @GetMapping("/timetable/{serviceId}")

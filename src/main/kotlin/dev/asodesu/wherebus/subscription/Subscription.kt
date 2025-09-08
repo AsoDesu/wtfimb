@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.interactions.components.ActionRow
 import net.dv8tion.jda.api.interactions.components.ItemComponent
 import net.dv8tion.jda.api.interactions.components.buttons.Button
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder
 
 class Subscription(
     val discordUserId: String,
@@ -61,21 +62,19 @@ class Subscription(
         }
     }
 
-    fun getExternalButtons(vehicleRef: String?): List<ItemComponent> {
-        if (vehicleRef.isNullOrBlank()) return listOf()
-        return buildList {
-            if (Values.baseUrl.isNotBlank()) {
-                val (_, fleetNo) = vehicleRef!!.split("-")
-                add(
-                    Button.link("${Values.baseUrl}/map?bus=$fleetNo", "View on map")
-                        .withEmoji(Emoji.fromUnicode("U+1F30D"))
-                )
-            }
-            add(
-                Button.link("https://bustimes.org/vehicles/${vehicleRef.lowercase()}", "bustimes.org")
-                .withEmoji(Emoji.fromUnicode("U+1F7E8"))
-            )
+    fun addExternalButtons(message: MessageCreateBuilder, vehicleRef: String?) {
+        if (vehicleRef.isNullOrBlank()) return
+        val actions = mutableListOf<ItemComponent>()
+        if (Values.baseUrl.isNotBlank()) {
+            val (_, fleetNo) = vehicleRef!!.split("-")
+            actions += Button.link("${Values.baseUrl}/map?bus=$fleetNo", "View on map")
+                .withEmoji(Emoji.fromUnicode("U+1F30D"))
         }
+
+        actions += Button.link("https://bustimes.org/vehicles/${vehicleRef.lowercase()}", "bustimes.org")
+            .withEmoji(Emoji.fromUnicode("U+1F7E8"))
+
+        message.addActionRow(actions)
     }
 
     fun getTimetable(vehicleInfo: Service): ServiceTimetableResponse {

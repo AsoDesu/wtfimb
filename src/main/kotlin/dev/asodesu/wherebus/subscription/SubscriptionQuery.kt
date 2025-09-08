@@ -58,8 +58,7 @@ class SubscriptionQuery(private val subscription: Subscription) {
 
         val message = MessageCreateBuilder()
             .addEmbeds(embed)
-
-        message.addActionRow(subscription.getExternalButtons(vehicle))
+        subscription.addExternalButtons(message, vehicle)
 
         return message.build()
     }

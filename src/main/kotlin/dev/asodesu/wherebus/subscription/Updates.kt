@@ -20,7 +20,7 @@ class Updates(val subscription: Subscription) {
         val message = MessageCreateBuilder()
             .addContent("<@${subscription.discordUserId}>")
             .addEmbeds(updates)
-        message.addActionRow(subscription.getExternalButtons(vehicleRef))
+        subscription.addExternalButtons(message, vehicleRef)
 
         channel.sendMessage(message.build()).queue()
     }

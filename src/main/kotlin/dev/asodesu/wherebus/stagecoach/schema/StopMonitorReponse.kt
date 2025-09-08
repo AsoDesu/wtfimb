@@ -1,5 +1,8 @@
 package dev.asodesu.wherebus.stagecoach.schema
 
+import java.lang.IllegalStateException
+import kotlin.math.exp
+
 class StopMonitorResponse(
     val stopMonitors: StopMonitors,
 )
@@ -29,11 +32,11 @@ class MonitoredCall(
     val direction: String,
     val vehicleRef: String,
     val cancelled: Boolean,
-    val aimedArrivalTime: String
-) {
-
-    var aimedDepartureTime: String? = null
-    var expectedArrivalTime: String? = null
+    var aimedArrivalTime: String? = null,
+    var aimedDepartureTime: String? = null,
+    var expectedArrivalTime: String? = null,
     var expectedDepartureTime: String? = null
-
+) {
+    var aimedTime = aimedArrivalTime ?: aimedDepartureTime ?: throw IllegalStateException("No arrival or departure time on call.")
+    var expectedTime = expectedArrivalTime ?: expectedDepartureTime
 }

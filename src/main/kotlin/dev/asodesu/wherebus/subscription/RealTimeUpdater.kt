@@ -31,8 +31,8 @@ class RealTimeUpdater(private val subscription: Subscription, val channel: Messa
         val monitor = stagecoach.monitorStops(service.stopId, serviceFilter = listOf(service.number))
         val call = subscription.getCallFromMonitor(monitor)
 
-        val currentExpectedIsoTime = call?.expectedArrivalTime
-        val currentScheduledTime = call?.aimedArrivalTime?.let { parseSeconds(it) }
+        val currentExpectedIsoTime = call?.expectedTime
+        val currentScheduledTime = call?.aimedTime?.let { parseSeconds(it) }
         if (!currentExpectedIsoTime.isNullOrBlank()) {
             val currentExpectedTime = parseSeconds(currentExpectedIsoTime)
             val notifyDistance = abs(lastExpectedTime - currentExpectedTime)

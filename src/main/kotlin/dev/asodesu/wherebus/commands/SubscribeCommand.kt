@@ -75,7 +75,7 @@ class SubscribeCommand(val stagecoach: StagecoachService) : Command {
                     val calls = stagecoach.stopEvents(stopId, 25)
                     val events = calls.events?.event ?: listOf()
                     events.map { event ->
-                        val date = Instant.parse(event.scheduledArrivalTime.value).atZone(ZoneId.systemDefault())
+                        val date = Instant.parse(event.scheduledTime.value).atZone(ZoneId.systemDefault())
                         val time = getTime(date)
                         val value = encodeServiceTime(event)
                         Choice("[$time] ${event.trip.service.serviceNumber} to ${event.trip.destinationBoard}", value)
@@ -91,7 +91,7 @@ class SubscribeCommand(val stagecoach: StagecoachService) : Command {
     private fun encodeServiceTime(event: Event): String {
         val trip = event.trip
         val service = trip.service.serviceNumber + trip.service.direction[0].uppercase()
-        val time = parseSeconds(event.scheduledArrivalTime.value)
+        val time = parseSeconds(event.scheduledTime.value)
         return "$service-$time"
     }
     private fun decodeServiceTime(string: String, stopId: String): ServiceDetail {

@@ -16,7 +16,7 @@ data class ServiceDetail(val number: String, val direction: Direction, val epoch
             val service = event.trip.service
             service.serviceNumber == number
                     && service.direction.equals(direction.name, ignoreCase = true)
-                    && parseSeconds(event.scheduledArrivalTime.value) == epochSeconds
+                    && parseSeconds(event.scheduledTime.value) == epochSeconds
         }.also { event = it }
     }
 

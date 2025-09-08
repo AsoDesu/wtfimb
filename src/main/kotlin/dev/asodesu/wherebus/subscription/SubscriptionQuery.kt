@@ -32,11 +32,11 @@ class SubscriptionQuery(private val subscription: Subscription) {
 
         var description: String
         val emote: String
-        if (call?.expectedArrivalTime == null) {
+        if (call?.expectedTime == null) {
             emote = ":calendar_spiral:"
             description = ":alarm_clock: **Scheduled Arrival: ** ${getTime(date)}"
         } else {
-            val expectedDate = Instant.parse(call.expectedArrivalTime).atZone(ZoneId.systemDefault())
+            val expectedDate = Instant.parse(call.expectedTime).atZone(ZoneId.systemDefault())
             description = ":alarm_clock: **Expected Arrival: ** ${getTime(expectedDate)}"
             emote = if (vehicle.isNullOrBlank()) {
                 ":infinity:"
@@ -59,12 +59,7 @@ class SubscriptionQuery(private val subscription: Subscription) {
         val message = MessageCreateBuilder()
             .addEmbeds(embed)
 
-        if (!vehicle.isNullOrBlank() && Values.baseUrl.isNotBlank()) {
-            val (_, fleetNo) = vehicle.split("-")
-            val button = Button.link("${Values.baseUrl}/map?bus=$fleetNo", "View on map")
-                .withEmoji(Emoji.fromUnicode("U+1F30D"))
-            message.addActionRow(button)
-        }
+        message.addActionRow(subscription.getExternalButtons(vehicle))
 
         return message.build()
     }

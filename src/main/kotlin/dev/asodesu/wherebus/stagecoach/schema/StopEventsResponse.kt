@@ -1,6 +1,7 @@
 package dev.asodesu.wherebus.stagecoach.schema
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.lang.IllegalStateException
 
 data class StopEvents(
     @JsonProperty("RequestId")
@@ -37,20 +38,14 @@ data class Event(
     @JsonProperty("StopLabel")
     val stopLabel: String,
     @JsonProperty("ScheduledArrivalTime")
-    val scheduledArrivalTime: ScheduledArrivalTime,
+    val scheduledArrivalTime: Value<String>? = null,
     @JsonProperty("ScheduledDepartureTime")
-    val scheduledDepartureTime: ScheduledDepartureTime,
+    val scheduledDepartureTime: Value<String>? = null,
     @JsonProperty("Trip")
     val trip: Trip,
-)
-
-data class ScheduledArrivalTime(
-    val value: String,
-)
-
-data class ScheduledDepartureTime(
-    val value: String,
-)
+) {
+    val scheduledTime = scheduledArrivalTime ?: scheduledDepartureTime ?: throw IllegalStateException("No scheduled times on this stop-event")
+}
 
 data class Trip(
     @JsonProperty("TripId")

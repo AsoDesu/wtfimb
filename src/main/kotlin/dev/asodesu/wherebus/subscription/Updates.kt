@@ -20,12 +20,7 @@ class Updates(val subscription: Subscription) {
         val message = MessageCreateBuilder()
             .addContent("<@${subscription.discordUserId}>")
             .addEmbeds(updates)
-        if (vehicleRef != null && Values.baseUrl.isNotBlank()) {
-            val (_, fleetNo) = vehicleRef!!.split("-")
-            val button = Button.link("${Values.baseUrl}/map?bus=$fleetNo", "View on map")
-                .withEmoji(Emoji.fromUnicode("U+1F30D"))
-            message.addActionRow(button)
-        }
+        message.addActionRow(subscription.getExternalButtons(vehicleRef))
 
         channel.sendMessage(message.build()).queue()
     }

@@ -1,9 +1,15 @@
 package dev.asodesu.wherebus.subscription
 
+import dev.asodesu.wherebus.Values
 import dev.asodesu.wherebus.stagecoach.StagecoachService
 import dev.asodesu.wherebus.stagecoach.parseSeconds
 import dev.asodesu.wherebus.stagecoach.schema.*
+import javax.swing.Action
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.entities.emoji.Emoji
+import net.dv8tion.jda.api.interactions.components.ActionRow
+import net.dv8tion.jda.api.interactions.components.ItemComponent
+import net.dv8tion.jda.api.interactions.components.buttons.Button
 
 class Subscription(
     val discordUserId: String,
@@ -25,7 +31,7 @@ class Subscription(
         return stops?.monitoredCalls?.monitoredCall?.firstOrNull { call ->
             call.lineRef == service.number
                     && call.direction.equals(service.direction.name, true)
-                    && parseSeconds(call.aimedArrivalTime) == service.epochSeconds
+                    && parseSeconds(call.aimedTime) == service.epochSeconds
         }
     }
 
@@ -52,6 +58,23 @@ class Subscription(
             "S" -> ":school:" // education
             "X" -> ":money_with_wings:" // business
             else -> ":blue_circle:" // unknown
+        }
+    }
+
+    fun getExternalButtons(vehicleRef: String?): List<ItemComponent> {
+        if (vehicleRef.isNullOrBlank()) return listOf()
+        return buildList {
+            if (Values.baseUrl.isNotBlank()) {
+                val (_, fleetNo) = vehicleRef!!.split("-")
+                add(
+                    Button.link("${Values.baseUrl}/map?bus=$fleetNo", "View on map")
+                        .withEmoji(Emoji.fromUnicode("U+1F30D"))
+                )
+            }
+            add(
+                Button.link("https://bustimes.org/vehicles/${vehicleRef.lowercase()}", "bustimes.org")
+                .withEmoji(Emoji.fromUnicode("U+1F7E8"))
+            )
         }
     }
 
